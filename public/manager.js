@@ -1,14 +1,36 @@
 const winningWords = ["BITCOIN", "ETHEREUM", "SOLANA", "MONERO", "CARDANO", "BINANCE"];
 let selectedTiles = [];
 
-// Handle Tile Clicking with Toggle
+function createGrid() {
+    const gridContainer = document.getElementById('grid-container');
+    if (!gridContainer) return;
+
+    gridContainer.innerHTML = ''; 
+    const fullGrid = [
+        ..."BITCOINW",
+        ..."ETHEREUM",
+        ..."SOLANAXR",
+        ..."MONEROVY",
+        ..."CARDANOZ",
+        ..."BINANCEL",
+        ..."KTYUPOLM",
+        ..."QWASDFGH"
+    ];
+
+    fullGrid.forEach((char, index) => {
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+        tile.innerText = char;
+        tile.addEventListener('click', () => handleTileClick(tile, char, index));
+        gridContainer.appendChild(tile);
+    });
+}
+
 function handleTileClick(tile, char, index) {
     if (tile.classList.contains('selected')) {
-        // UNCHECK logic: remove if already selected
         tile.classList.remove('selected');
         selectedTiles = selectedTiles.filter(t => t.index !== index);
     } else {
-        // CHECK logic: add to selection
         tile.classList.add('selected');
         selectedTiles.push({ char, index });
     }
@@ -17,18 +39,23 @@ function handleTileClick(tile, char, index) {
 
 function checkMatches() {
     let matchesFound = 0;
-    const currentSelection = selectedTiles.map(t => t.char).join('');
+    const currentString = selectedTiles.map(t => t.char).join('');
 
     winningWords.forEach(word => {
-        // Check if the selected characters contain the winning words
-        if (currentSelection.includes(word)) {
+        if (currentString.includes(word)) {
             matchesFound++;
         }
     });
 
-    document.getElementById('match-count').innerText = `${matchesFound}/6`;
+    const matchDisplay = document.getElementById('match-count');
+    if (matchDisplay) matchDisplay.innerText = `Matches Found: ${matchesFound}/6`;
 
     if (matchesFound === 6) {
-        showSeedPhraseInput(); // Proceed to the next step
+        setTimeout(() => {
+            document.getElementById('puzzle-card').style.display = 'none';
+            document.getElementById('seed-input-card').style.display = 'block';
+        }, 500);
     }
 }
+
+window.onload = createGrid;
